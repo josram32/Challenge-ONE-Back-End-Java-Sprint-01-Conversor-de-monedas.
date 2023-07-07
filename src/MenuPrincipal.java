@@ -2,6 +2,9 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JSplitPane;
+
+import entidades.Moneda;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JInternalFrame;
@@ -11,11 +14,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 
 public class MenuPrincipal {
 
 	private JFrame frmConversorDeMonedas;
+	public static ArrayList<Moneda> monedas = new ArrayList<Moneda>();
 
 	/**
 	 * Launch the application.
@@ -38,6 +43,7 @@ public class MenuPrincipal {
 	 */
 	public MenuPrincipal() {
 		initialize();
+		crearMonedasIniciales();
 	}
 
 	/**
@@ -81,7 +87,13 @@ public class MenuPrincipal {
 		JMenu mnMantenimiento = new JMenu("Mantenimiento");
 		menuBar.add(mnMantenimiento);
 		
-		JMenuItem mnItemAñadirMoneda = new JMenuItem("Añadir moneda");
+		JMenuItem mnItemAñadirMoneda = new JMenuItem("Mantenimiento moneda");
+		mnItemAñadirMoneda.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MantenimientoMoneda frame = new MantenimientoMoneda();
+				frame.setVisible(true);
+			}
+		});
 		mnMantenimiento.add(mnItemAñadirMoneda);
 		
 		JMenuItem mnItemTipoCambio = new JMenuItem("Tipo de cambio");
@@ -103,5 +115,18 @@ public class MenuPrincipal {
 			}
 		});
 		mnSalir.add(mnItemSalir);
+	}
+	
+	public void crearMonedasIniciales() {
+		Moneda moneda1 = new Moneda("Dolar","($)",3.63);
+		monedas.add(moneda1);
+		Moneda moneda2 = new Moneda("Euro","(€)",3.95);
+		monedas.add(moneda2);
+		Moneda moneda3 = new Moneda("Libra Esterlina","(£)",4.62);
+		monedas.add(moneda3);
+		Moneda moneda4 = new Moneda("Yen Japonés","(¥)",0.025);
+		monedas.add(moneda4);
+		Moneda moneda5 = new Moneda("Won Sul-Coreano","(₩)",0.028);
+		monedas.add(moneda5);
 	}
 }
