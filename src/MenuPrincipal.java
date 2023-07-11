@@ -96,9 +96,6 @@ public class MenuPrincipal {
 		});
 		mnMantenimiento.add(mnItemAñadirMoneda);
 		
-		JMenuItem mnItemTipoCambio = new JMenuItem("Tipo de cambio");
-		mnMantenimiento.add(mnItemTipoCambio);
-		
 		JMenu mnAyuda = new JMenu("Ayuda");
 		menuBar.add(mnAyuda);
 		

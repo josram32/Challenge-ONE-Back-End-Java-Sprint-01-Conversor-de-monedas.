@@ -13,6 +13,7 @@ public class Moneda {
 	}
 	
 	
+	
 	public String getSimbolo() {
 		return simbolo;
 	}

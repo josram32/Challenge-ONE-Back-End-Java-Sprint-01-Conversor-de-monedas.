@@ -31,6 +31,10 @@ public class MantenimientoMoneda extends JFrame {
 	private JTable tblMonedas;
 	private DefaultTableModel tabla = new DefaultTableModel();
 	private Moneda monedaSeleccionada;
+	private JButton btnAñadir;
+	private JButton btnReiniciar;
+	private JButton btnActualizar;
+	private JButton btnEliminar;
 
 	/**
 	 * Launch the application.
@@ -79,7 +83,7 @@ public class MantenimientoMoneda extends JFrame {
 		tblMonedas.getColumnModel().getColumn(2).setPreferredWidth(100);
 		JScrollPane scrollPane = new JScrollPane(tblMonedas);
 		llenarTabla();
-		
+
 		inputTipoCambio = new JTextField();
 		inputTipoCambio.setColumns(10);
 
@@ -100,7 +104,7 @@ public class MantenimientoMoneda extends JFrame {
 		inputTipoCambio.setBounds(102, 92, 86, 20);
 		scrollPane.setBounds(15, 206, 409, 136);
 
-		JButton btnAñadir = new JButton("Añadir");
+		btnAñadir = new JButton("Añadir");
 		btnAñadir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				añadirNuevaMoneda();
@@ -109,93 +113,148 @@ public class MantenimientoMoneda extends JFrame {
 		btnAñadir.setBounds(325, 15, 99, 23);
 		contentPane.add(btnAñadir);
 		
-		JButton btnActualizar = new JButton("Actualizar");
-		btnActualizar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnActualizar.setBounds(325, 91, 99, 23);
-		contentPane.add(btnActualizar);
-		btnActualizar.setEnabled(false);
-		
-		JButton btnEliminar = new JButton("Eliminar");
+		btnEliminar = new JButton("Eliminar");
 		btnEliminar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				eliminarMoneda();
-				limpiarCampos();
-				llenarTabla();
 			}
 		});
 		btnEliminar.setEnabled(false);
 		btnEliminar.setBounds(325, 128, 99, 23);
 		contentPane.add(btnEliminar);
-		
-		JButton btnReiniciar = new JButton("Reiniciar");
+
+		btnActualizar = new JButton("Actualizar");
+		btnActualizar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actualizarMoneda();
+			}
+		});
+		btnActualizar.setBounds(325, 91, 99, 23);
+		contentPane.add(btnActualizar);
+		btnActualizar.setEnabled(false);
+
+		btnReiniciar = new JButton("Reiniciar");
 		btnReiniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				limpiarCampos();
 				btnActualizar.setEnabled(false);
-                btnEliminar.setEnabled(false);
-                btnAñadir.setEnabled(true);
-				
+				btnEliminar.setEnabled(false);
+				btnAñadir.setEnabled(true);
+
 			}
 		});
-		btnReiniciar.setBounds(325, 53, 99, 23);		
+		btnReiniciar.setBounds(325, 53, 99, 23);
 		contentPane.add(btnReiniciar);
-		
+
 		JLabel lblNewLabel = new JLabel("*Para modificar datos de alguna moneda seleccionela en la tabla");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		lblNewLabel.setBounds(15, 188, 409, 14);
 		contentPane.add(lblNewLabel);
-		
-		tblMonedas.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+		tblMonedas.getSelectionModel().addListSelectionListener(new ListSelectionListener() {// seleccionamos una moneda
+																								// de la tabla
 			public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) { // Solo se dispara una vez al completar la selección
-                    int selectedRow = tblMonedas.getSelectedRow();
-                    if (selectedRow != -1) { // Verificar que se haya seleccionado una fila válida
-                        String nombre = (String) tabla.getValueAt(selectedRow, 0);
-                        monedaSeleccionada = buscarMonedaPorNombre(nombre);
-                        if (monedaSeleccionada != null) {
-                            cargarDatos(monedaSeleccionada);                   
-                            btnActualizar.setEnabled(true);
-                            btnEliminar.setEnabled(true);
-                            btnAñadir.setEnabled(false);
-                        }
-                     }
-                }
-            }
+				if (!e.getValueIsAdjusting()) { // Solo se dispara una vez al completar la selección
+					int selectedRow = tblMonedas.getSelectedRow();
+					if (selectedRow != -1) { // Verificar que se haya seleccionado una fila válida
+						String nombre = (String) tabla.getValueAt(selectedRow, 0);
+						monedaSeleccionada = buscarMonedaPorNombre(nombre);
+						if (monedaSeleccionada != null) {
+							cargarDatos(monedaSeleccionada);// se cargan los datos de la moneda seleccionada en los
+															// campos correspondientes
+							btnActualizar.setEnabled(true);
+							btnEliminar.setEnabled(true);
+							btnAñadir.setEnabled(false);
+						}
+					}
+				}
+			}
 		});
 	}
-	
-	
+
+	protected void actualizarMoneda() {
+		Boolean ok = false; // esta variable nos permitira registrar los cambios de la moneda mientras sea true
+		String nombre = inputNombre.getText();
+		String simbolo = inputSimbolo.getText();
+		String tipoCambio = inputTipoCambio.getText();
+
+		ok = validarCampos(nombre, simbolo, tipoCambio); //vañlidamos que los campos sean llenados correctamente
+
+		if (ok) {
+			ok = validarMonedaEditada(nombre, simbolo);//validamos  que la moneda no repita la informacion de otras monedas
+		}
+		if (ok)
+			guardarCambios(nombre, simbolo, tipoCambio);
+	}
+
+	private void guardarCambios(String nombre, String simbolo, String tipoCambio) {
+		for (Moneda moneda : MenuPrincipal.monedas) {// recorremos el arreglos de moneda
+			if (moneda == monedaSeleccionada) {// indicamos la moneda a modificar
+				moneda.setNombre(nombre);
+				moneda.setSimbolo(simbolo);
+				moneda.setTipoCambio(Double.parseDouble(tipoCambio));
+				JOptionPane.showInternalMessageDialog(null, "Se guardaron los cambios exitosamente");
+				limpiarCampos();
+				llenarTabla();
+				btnActualizar.setEnabled(false);
+				btnEliminar.setEnabled(false);
+				btnAñadir.setEnabled(true);
+
+			}
+		}
+	}
+
+	private Boolean validarMonedaEditada(String nombre, String simbolo) {
+
+		for (Moneda moneda : MenuPrincipal.monedas) {
+
+			if (moneda != monedaSeleccionada) { // con esta condicion evitamos que la moneda se compare consigo misma
+				if (moneda.getNombre().equals(nombre)) {
+					JOptionPane.showInternalMessageDialog(null, "El nombre de esa moneda ya existe");
+					return false;
+				}
+				if (moneda.getSimbolo().equals(simbolo)) {
+					JOptionPane.showInternalMessageDialog(null, "El simbolo de esa moneda ya existe");
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
 	protected void eliminarMoneda() {
-		
-		MenuPrincipal.monedas.remove(monedaSeleccionada);		
+		// confirmamos que la accion eliminar se lleve a cabo
+		int confirmacion = JOptionPane.showConfirmDialog(null, "¿Desea eliminar esta moneda?", "Moneda eliminada",
+				JOptionPane.YES_NO_OPTION);
+		if (confirmacion == JOptionPane.YES_OPTION) {// si la respuesta es si se elimina la moneda del arreglo
+			MenuPrincipal.monedas.remove(monedaSeleccionada);
+			limpiarCampos();
+			llenarTabla();
+		}
 	}
 
 	protected void cargarDatos(Moneda monedaSeleccionada) {
 		inputNombre.setText(monedaSeleccionada.getNombre());
-		inputSimbolo.setText(monedaSeleccionada.getSimbolo());	
-		inputTipoCambio.setText(monedaSeleccionada.getTipoCambio()+"");
+		inputSimbolo.setText(monedaSeleccionada.getSimbolo());
+		inputTipoCambio.setText(monedaSeleccionada.getTipoCambio() + "");
 	}
-	
+
 	protected Moneda buscarMonedaPorNombre(String nombre) {
-	    for (Moneda moneda : MenuPrincipal.monedas) {
-	        if (moneda.getNombre().equals(nombre)) {
-	            return moneda;
-	        }
-	    }
-	    return null;
+		for (Moneda moneda : MenuPrincipal.monedas) {
+			if (moneda.getNombre().equals(nombre)) {
+				return moneda;
+			}
+		}
+		return null;
 	}
 
 	protected void limpiarCampos() {
 		inputNombre.setText("");
 		inputSimbolo.setText("");
-		inputTipoCambio.setText("");	
+		inputTipoCambio.setText("");
 		tblMonedas.clearSelection();
 		tabla.setRowCount(0);
-		
+
 	}
 
 	public void añadirColumnas() {
@@ -206,7 +265,7 @@ public class MantenimientoMoneda extends JFrame {
 
 	public void llenarTabla() {
 		for (Moneda moneda : MenuPrincipal.monedas) {
-			tabla.addRow(new Object[] {moneda.getNombre(), moneda.getSimbolo(), moneda.getTipoCambio() });
+			tabla.addRow(new Object[] { moneda.getNombre(), moneda.getSimbolo(), moneda.getTipoCambio() });
 		}
 	}
 
@@ -214,7 +273,7 @@ public class MantenimientoMoneda extends JFrame {
 
 		Boolean ok = false; // esta variable nos permitira registrar la nueva moneda mientras sea true
 		String nombre = inputNombre.getText();
-		String simbolo = "("+inputSimbolo.getText()+")";
+		String simbolo = "(" + inputSimbolo.getText() + ")";
 		String tipoCambio = inputTipoCambio.getText();
 
 		// validamos primero que los campos no esten vacios
