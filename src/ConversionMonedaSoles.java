@@ -76,7 +76,7 @@ public class ConversionMonedaSoles extends JFrame {
 					JOptionPane.showInternalMessageDialog(null, "Seleccione el tipo de moneda");
 				
 				if(e.getKeyChar()=='\n' && cboMoneda.getSelectedIndex()>=1) 
-					validarMonto();
+					convertir();
 				
 			}
 		});
@@ -99,7 +99,7 @@ public class ConversionMonedaSoles extends JFrame {
 		cboMoneda.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(cboMoneda.getSelectedIndex()>=1 && !inputMonto.getText().equals("")) {
-					validarMonto();
+					convertir();;
 				}
 			}
 		});
@@ -151,8 +151,13 @@ public class ConversionMonedaSoles extends JFrame {
 	}
 	
 	protected void reiniciar() {
+		//Eliminamos los items del combo para de esta manera al volverlo a llenar se añaden monedas nuevas en caso se hayan añadido
+		//De esta manera podemos actualizar las monedass sin necesidad de cerrar y abrir el frame
+		
+		cboMoneda.removeAllItems();
+		cboMoneda.setModel(new DefaultComboBoxModel(new String[] {"Seleccione moneda..."}));
+		llenarCombo();
 		inputMonto.setText("0.00");
-		cboMoneda.setSelectedIndex(0);
 		inputTipoCambio.setText("");
 		inputTotal.setText("");
 		
@@ -164,24 +169,32 @@ public class ConversionMonedaSoles extends JFrame {
 		}
 	}
 	
-	public void validarMonto() {
-		if(inputMonto.getText().equals("")) 
+	public Boolean validarMonto() {
+		if (inputMonto.getText().equals("")) {
 			JOptionPane.showInternalMessageDialog(null, "Ingrese un monto");
-		else if(!inputMonto.getText().matches("^\\d+(\\.\\d+)?$"))
-			JOptionPane.showInternalMessageDialog(null, "Ingrese un monto válido\n- No letras\n- No caracteres especiales\n");
-		else
-			convertir();
+			return false;
+		}
+		if (!inputMonto.getText().matches("^\\d+(\\.\\d+)?$")) {
+			JOptionPane.showInternalMessageDialog(null,
+					"Ingrese un monto válido\n- No letras\n- No caracteres especiales\n");
+			return false;
+		}
+		return true;
 	}
-	
+
 	public void convertir() {
-		
-		DecimalFormat df = new DecimalFormat("#.###");
-		double monto = Double.parseDouble(inputMonto.getText());
-		int monedaSeleccionada = cboMoneda.getSelectedIndex()-1;
-		Moneda moneda = MenuPrincipal.monedas.get(monedaSeleccionada);
-		double tipoCambio = moneda.getTipoCambio();
-		inputTipoCambio.setText(""+tipoCambio);
-		double resultado = monto * tipoCambio;
-		inputTotal.setText(""+df.format(resultado));		
+
+		Boolean ok = validarMonto();
+
+		if (ok) {
+			DecimalFormat df = new DecimalFormat("#.###");
+			double monto = Double.parseDouble(inputMonto.getText());
+			int monedaSeleccionada = cboMoneda.getSelectedIndex() - 1;
+			Moneda moneda = MenuPrincipal.monedas.get(monedaSeleccionada);
+			double tipoCambio = moneda.getTipoCambio();
+			inputTipoCambio.setText("" + tipoCambio);
+			double resultado = monto * tipoCambio;
+			inputTotal.setText("" + df.format(resultado));
+		}
 	}
 }

@@ -16,6 +16,7 @@ import javax.swing.JMenu;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
+import javax.swing.JLabel;
 
 public class MenuPrincipal {
 
@@ -84,6 +85,15 @@ public class MenuPrincipal {
 		
 		mnConversiones.add(mnItemMonedaSoles);
 		
+		JMenuItem mnItemMonedaAMoneda = new JMenuItem("De una moneda a otra moneda");
+		mnItemMonedaAMoneda.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MonedaAMoneda frame = new MonedaAMoneda();
+				frame.setVisible(true);
+			}
+		});
+		mnConversiones.add(mnItemMonedaAMoneda);
+		
 		JMenu mnMantenimiento = new JMenu("Mantenimiento");
 		menuBar.add(mnMantenimiento);
 		
@@ -95,12 +105,6 @@ public class MenuPrincipal {
 			}
 		});
 		mnMantenimiento.add(mnItemAñadirMoneda);
-		
-		JMenu mnAyuda = new JMenu("Ayuda");
-		menuBar.add(mnAyuda);
-		
-		JMenuItem mnItemAcercaDe = new JMenuItem("Acerca de...");
-		mnAyuda.add(mnItemAcercaDe);
 		
 		JMenu mnSalir = new JMenu("Salir");
 		menuBar.add(mnSalir);
